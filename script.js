@@ -1,15 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Crear una instancia del cliente de Supabase
-const supabaseUrl = 'https://your-supabase-url.supabase.co';
-const supabaseKey = 'your-supabase-key';
+const supabaseUrl = 'https://isohfhdlucjskyfclowl.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlzb2hmaGRsdWNqc2t5ZmNsb3dsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDExMTE2NzcsImV4cCI6MjAxNjY4NzY3N30.T1A_9nYo0Ef2xDxG_7ol-QjCFYytBrsri5ktsV3qqRg';
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+// MODELO DE DATOS
+const peliculasTable = 'peliculas';
 
 // VISTAS
 const indexView = async () => {
     // Obtener los datos de la base de datos de Supabase
     const { data: peliculas, error } = await supabase
-        .from('peliculas')
+        .from(peliculasTable)
         .select('*');
 
     if (error) {
@@ -47,7 +50,7 @@ const indexView = async () => {
 const editView = async (i) => {
     // Obtener los datos de la película específica de la base de datos de Supabase
     const { data: pelicula, error } = await supabase
-        .from('peliculas')
+        .from(peliculasTable)
         .select('*')
         .eq('id', i);
 
@@ -85,7 +88,7 @@ const editView = async (i) => {
 const showView = async (i) => {
     // Obtener los datos de la película específica de la base de datos de Supabase
     const { data: pelicula, error } = await supabase
-        .from('peliculas')
+        .from(peliculasTable)
         .select('*')
         .eq('id', i);
 
@@ -149,7 +152,7 @@ const createContr = async () => {
 
     // Insertar la nueva película en la base de datos de Supabase
     const { data, error } = await supabase
-        .from('peliculas')
+        .from(peliculasTable)
         .insert([{ titulo, director, estreno }]);
 
     if (error) {
@@ -171,7 +174,7 @@ const updateContr = async (i) => {
 
     // Actualizar la película en la base de datos de Supabase
     const { data, error } = await supabase
-        .from('peliculas')
+        .from(peliculasTable)
         .update({ titulo, director, miniatura })
         .eq('id', i);
 
@@ -186,7 +189,7 @@ const updateContr = async (i) => {
 const deleteContr = async (i) => {
     // Eliminar la película de la base de datos de Supabase
     const { data, error } = await supabase
-        .from('peliculas')
+        .from(peliculasTable)
         .delete()
         .eq('id', i);
 
@@ -201,7 +204,7 @@ const deleteContr = async (i) => {
 const resetContr = async () => {
     // Eliminar todas las películas de la base de datos de Supabase
     const { data, error } = await supabase
-        .from('peliculas')
+        .from(peliculasTable)
         .delete();
 
     if (error) {
