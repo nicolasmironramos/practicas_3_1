@@ -1,7 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-// MODELO DE DATOS
-
-// Importar la biblioteca de Supabase
 
 // Crear una instancia del cliente de Supabase
 const supabaseUrl = 'https://your-supabase-url.supabase.co';
