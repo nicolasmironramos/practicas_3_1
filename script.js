@@ -1,60 +1,79 @@
+import { createClient } from '@supabase/supabase-js';
 // MODELO DE DATOS
 
-let mis_peliculas_iniciales = [
-    {titulo: "Superlópez",   director: "Javier Ruiz Caldera", "miniatura": "files/superlopez.png"},
-    {titulo: "Jurassic Park", director: "Steven Spielberg", "miniatura": "files/jurassicpark.png"},
-    {titulo: "Interstellar",  director: "Christopher Nolan", "miniatura": "files/interstellar.png"}
-];
+// Importar la biblioteca de Supabase
 
-localStorage.mis_peliculas = localStorage.mis_peliculas || JSON.stringify(mis_peliculas_iniciales);
+// Crear una instancia del cliente de Supabase
+const supabaseUrl = 'https://your-supabase-url.supabase.co';
+const supabaseKey = 'your-supabase-key';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // VISTAS
-const indexView = (peliculas) => {
-    let i=0;
-    let view = "";
+const indexView = async () => {
+    // Obtener los datos de la base de datos de Supabase
+    const { data: peliculas, error } = await supabase
+        .from('peliculas')
+        .select('*');
 
-    while(i < peliculas.length) {
-      view += `
-        <div class="movie">
-           <div class="movie-img">
-                <img data-my-id="${i}" src="${peliculas[i].miniatura}" onerror="this.src='files/placeholder.png'"/>
-           </div>
-           <div class="title">
-               ${peliculas[i].titulo || "<em>Sin título</em>"}
-           </div>
-           <div class="actions">
-               <button class="show" data-my-id="${i}">Mostrar</button>
-               <button class="delete" data-my-id="${i}">Borrar</button>
-               <button class="edit" data-my-id="${i}">Editar</button>
-            </div>
-        </div>\n`;
-      i = i + 1;
-    };
+    if (error) {
+        console.error(error);
+        return '';
+    }
+
+    let view = '';
+
+    peliculas.forEach((pelicula, i) => {
+        view += `
+            <div class="movie">
+                <div class="movie-img">
+                    <img data-my-id="${i}" src="${pelicula.miniatura}" onerror="this.src='files/placeholder.png'"/>
+                </div>
+                <div class="title">
+                    ${pelicula.titulo || "<em>Sin título</em>"}
+                </div>
+                <div class="actions">
+                    <button class="show" data-my-id="${i}">Mostrar</button>
+                    <button class="delete" data-my-id="${i}">Borrar</button>
+                    <button class="edit" data-my-id="${i}">Editar</button>
+                </div>
+            </div>\n`;
+    });
 
     view += `<div class="actions">
-                <button class="new">Añadir</button>
-                <button class="reset">Reset</button>
-            </div>`;
+                            <button class="new">Añadir</button>
+                            <button class="reset">Reset</button>
+                        </div>`;
 
     return view;
 };
 
-const editView = (i, pelicula) => {
+const editView = async (i) => {
+    // Obtener los datos de la película específica de la base de datos de Supabase
+    const { data: pelicula, error } = await supabase
+        .from('peliculas')
+        .select('*')
+        .eq('id', i);
+
+    if (error) {
+        console.error(error);
+        return '';
+    }
+
     return `<h2>Editar Película </h2>
         <div class="field">
-        Título <br>
-        <input  type="text" id="titulo" placeholder="Título" 
-                value="${pelicula.titulo}">
+            Título <br>
+            <input  type="text" id="titulo" placeholder="Título" 
+                            value="${pelicula.titulo}">
         </div>
         <div class="field">
-        Director <br>
-        <input  type="text" id="director" placeholder="Director" 
-                value="${pelicula.director}">
+            Director <br>
+            <input  type="text" id="director" placeholder="Director" 
+                            value="${pelicula.director}">
         </div>
         <div class="field">
-        Miniatura <br>
-        <input  type="text" id="miniatura" placeholder="URL de la miniatura" 
-                value="${pelicula.miniatura}">
+            Miniatura <br>
+            <input  type="text" id="miniatura" placeholder="URL de la miniatura" 
+                            value="${pelicula.miniatura}">
         </div>
         <div class="actions">
             <button class="update" data-my-id="${i}">
@@ -63,40 +82,45 @@ const editView = (i, pelicula) => {
             <button class="index">
                 Volver
             </button>
-       `;
-}
+        </div>`;
+};
 
-const showView = (pelicula) => {
-    // Completar: genera HTML con información de la película
-    // ...
+const showView = async (i) => {
+    // Obtener los datos de la película específica de la base de datos de Supabase
+    const { data: pelicula, error } = await supabase
+        .from('peliculas')
+        .select('*')
+        .eq('id', i);
+
+    if (error) {
+        console.error(error);
+        return '';
+    }
 
     return `
-     <p>
-     
-     
-     
-     </p>
-     <div class="actions">
-        <button class="index">Volver</button>
-     </div>`;
-}
+        <p>
+            Título: ${pelicula.titulo}<br>
+            Director: ${pelicula.director}<br>
+            Miniatura: ${pelicula.miniatura}<br>
+        </p>
+        <div class="actions">
+            <button class="index">Volver</button>
+        </div>`;
+};
 
 const newView = () => {
-    // Completar: genera formulario para crear nuevo quiz
-    // ...
-
     return `<h2>Crear Película</h2>
         <div class="field">
-        Título <br>
-        <input  type="text" id="titulo" placeholder="Título">
+            Título <br>
+            <input  type="text" id="titulo" placeholder="Título">
         </div>
         <div class="field">
-        Director <br>
-        <input  type="text" id="director" placeholder="Director">
+            Director <br>
+            <input  type="text" id="director" placeholder="Director">
         </div>
         <div class="field">
-        Estreno <br>
-        <input  type="text" id="estreno" placeholder="Estreno">
+            Estreno <br>
+            <input  type="text" id="estreno" placeholder="Estreno">
         </div>
         <div class="actions">
             <button class="create">
@@ -106,59 +130,88 @@ const newView = () => {
                 Volver
             </button>
         </div>`;
-}
-
-
-// CONTROLADORES 
-const indexContr = () => {
-    let mis_peliculas = JSON.parse(localStorage.mis_peliculas);
-    document.getElementById('main').innerHTML = indexView(mis_peliculas);
 };
 
-const showContr = (i) => {
-    // Completar: controlador que muestra la vista showView(pelicula)
-    // ...
+// CONTROLADORES 
+const indexContr = async () => {
+    document.getElementById('main').innerHTML = await indexView();
+};
 
+const showContr = async (i) => {
+    document.getElementById('main').innerHTML = await showView(i);
 };
 
 const newContr = () => {
     document.getElementById('main').innerHTML = newView();
 };
 
-const createContr = () => {
-    let mis_peliculas = JSON.parse(localStorage.mis_peliculas);
-    let titulo = document.getElementById('titulo').value;
-    let director = document.getElementById('director').value;
-    let estreno = document.getElementById('estreno').value;
-    let pelicula = {titulo: titulo, director: director, estreno: estreno};
-    mis_peliculas.push(pelicula);
-    localStorage.mis_peliculas = JSON.stringify(mis_peliculas);
+const createContr = async () => {
+    const titulo = document.getElementById('titulo').value;
+    const director = document.getElementById('director').value;
+    const estreno = document.getElementById('estreno').value;
+
+    // Insertar la nueva película en la base de datos de Supabase
+    const { data, error } = await supabase
+        .from('peliculas')
+        .insert([{ titulo, director, estreno }]);
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
     indexContr();
 };
 
-const editContr = (i) => {
-    let pelicula = JSON.parse(localStorage.mis_peliculas)[i];
-    document.getElementById('main').innerHTML = editView(i, pelicula);
+const editContr = async (i) => {
+    document.getElementById('main').innerHTML = await editView(i);
 };
 
-const updateContr = (i) => {
-    let mis_peliculas = JSON.parse(localStorage.mis_peliculas);
-    mis_peliculas[i].titulo    = document.getElementById('titulo').value;
-    mis_peliculas[i].director  = document.getElementById('director').value;
-    mis_peliculas[i].miniatura = document.getElementById('miniatura').value;
-    localStorage.mis_peliculas = JSON.stringify(mis_peliculas);
+const updateContr = async (i) => {
+    const titulo = document.getElementById('titulo').value;
+    const director = document.getElementById('director').value;
+    const miniatura = document.getElementById('miniatura').value;
+
+    // Actualizar la película en la base de datos de Supabase
+    const { data, error } = await supabase
+        .from('peliculas')
+        .update({ titulo, director, miniatura })
+        .eq('id', i);
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
     indexContr();
 };
 
-const deleteContr = (i) => {
-    let mis_peliculas = JSON.parse(localStorage.mis_peliculas);
-    mis_peliculas.splice(i, 1);
-    localStorage.mis_peliculas = JSON.stringify(mis_peliculas);
+const deleteContr = async (i) => {
+    // Eliminar la película de la base de datos de Supabase
+    const { data, error } = await supabase
+        .from('peliculas')
+        .delete()
+        .eq('id', i);
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
     indexContr();
 };
 
-const resetContr = () => {
-    localStorage.mis_peliculas = JSON.stringify(mis_peliculas_iniciales);
+const resetContr = async () => {
+    // Eliminar todas las películas de la base de datos de Supabase
+    const { data, error } = await supabase
+        .from('peliculas')
+        .delete();
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
     indexContr();
 };
 
@@ -166,17 +219,27 @@ const resetContr = () => {
 const matchEvent = (ev, sel) => ev.target.matches(sel);
 const myId = (ev) => Number(ev.target.dataset.myId);
 
-document.addEventListener('click', ev => {
-    if      (matchEvent(ev, '.index'))  indexContr  ();
-    else if (matchEvent(ev, '.show'))   showContr   (myId(ev));
-    else if (matchEvent(ev, '.new'))    newContr    ();
-    else if (matchEvent(ev, '.create')) createContr ();
-    else if (matchEvent(ev, '.edit'))   editContr   (myId(ev));
-    else if (matchEvent(ev, '.update')) updateContr (myId(ev));
-    else if (matchEvent(ev, '.delete')) deleteContr (myId(ev));
-    else if (matchEvent(ev, '.reset'))  resetContr  ();
-})
-
+document.addEventListener('click', async (ev) => {
+    if (matchEvent(ev, '.index')) {
+        await indexContr();
+    } else if (matchEvent(ev, '.show')) {
+        await showContr(myId(ev));
+    } else if (matchEvent(ev, '.new')) {
+        newContr();
+    } else if (matchEvent(ev, '.create')) {
+        await createContr();
+    } else if (matchEvent(ev, '.edit')) {
+        await editContr(myId(ev));
+    } else if (matchEvent(ev, '.update')) {
+        await updateContr(myId(ev));
+    } else if (matchEvent(ev, '.delete')) {
+        await deleteContr(myId(ev));
+    } else if (matchEvent(ev, '.reset')) {
+        await resetContr();
+    }
+});
 
 // Inicialización        
-document.addEventListener('DOMContentLoaded', indexContr);
+document.addEventListener('DOMContentLoaded', async () => {
+    await indexContr();
+});
