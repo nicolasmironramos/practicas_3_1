@@ -1,0 +1,43 @@
+body {
+  --primary: #6200ee;
+  --secondary: #29b6f6;
+  margin: 0px;
+}
+
+* {
+  font-family: 'Roboto', sans-serif;
+}
+
+button {
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  text-decoration: none;
+  margin: 2px;
+  color: var(--primary);
+  background: white;
+  border: 1px solid var(--primary);
+  height: 20px;
+  font-size: 9px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: ease-in 0.2s all;
+  padding: 0 8px 0 8px;
+}
+
+div#main {
+  padding: 10px;
+}
+
+input {
+  margin-bottom: 5px;
+  margin-top: 2px;
+  padding: 4px;
+  font-size: 12px;
+}
+
+h1 {
+  background: var(--primary);
+  color: white;
+  font-weight: 300;
+  text-transform: uppercase;
+}
